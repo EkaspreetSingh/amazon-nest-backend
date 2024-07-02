@@ -24,8 +24,8 @@ export class OrderService {
       else {
         const newOrder = await Order.create({
           userId: createOrderDto.userId,
-          orderPrice: createOrderDto.orderPrice,
-          orderAddress: createOrderDto.orderAddress,
+          price: createOrderDto.price,
+          address: createOrderDto.address,
           orderItems: createOrderDto.orderItems,  
         }, {
           include: [OrderItem]
@@ -49,7 +49,7 @@ export class OrderService {
   }
 
   async findOne(id: number) {
-    const res = await Order.findOne({where: {orderId: id}});
+    const res = await Order.findOne({where: {id: id}});
     // console.log("------------------------------------------------"+res)
     if(!res) {
       throw new NotFoundException(`Order with id ${id} not found`);
@@ -59,7 +59,7 @@ export class OrderService {
 
   async update(id: number, updateOrderDto: UpdateOrderDto) {
     const res = await Order.update(updateOrderDto, {
-      where: {orderId: id},
+      where: {id: id},
     });
     if(!res[0]) {
       throw new NotFoundException(`Order with id ${id} not found`);
@@ -69,7 +69,7 @@ export class OrderService {
 
   async remove(id: number) {
     try {
-      const numberOfDeletedRows = await Order.destroy({ where: {orderId: id} });;
+      const numberOfDeletedRows = await Order.destroy({ where: {id: id} });;
       if (numberOfDeletedRows === 0) {
         throw new NotFoundException(`Order with id ${id} not found`);
       }

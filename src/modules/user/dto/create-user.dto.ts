@@ -1,17 +1,21 @@
 import { IsBoolean, IsEmail, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsPhoneNumber, IsString, IsStrongPassword, Min } from "class-validator";
 import { ENUM_GENDER, ENUM_ROLES } from '../../../../constants';
+import { Trim } from '../../../custom-pipes/trim-transformer'
 
 export class CreateUserDto {
     @IsString()
     @IsNotEmpty()
+    @Trim()
     firstName: string;
 
     @IsString()
     @IsOptional()
+    @Trim()
     lastName?: string;
 
     @IsNotEmpty()
     @IsEmail()
+    @Trim()
     email: string;   
 
     @IsPhoneNumber()

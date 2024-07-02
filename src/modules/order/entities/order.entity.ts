@@ -7,17 +7,17 @@ export class Order extends Model<Order> {
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.INTEGER)
-  orderId: number;
+  id: number;
 
   @ForeignKey(() => User)
   @Column(DataType.INTEGER)
   userId: number;
 
   @Column(DataType.FLOAT)
-  orderPrice: number;
+  price: number;
 
   @Column(DataType.STRING)
-  orderAddress: string;
+  address: string;
 
   @HasMany(() => OrderItem)
   orderItems: OrderItem[];

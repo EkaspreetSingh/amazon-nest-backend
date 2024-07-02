@@ -1,8 +1,10 @@
 import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { Trim } from "src/custom-pipes/trim-transformer";
 
 export class CreateProductDto {
     @IsString()
     @IsNotEmpty()
+    @Trim()
     name: string;
 
     @IsNumber()

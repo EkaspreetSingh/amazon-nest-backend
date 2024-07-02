@@ -11,10 +11,10 @@ export class CreateOrderDto {
     @IsNumber()
     @IsPositive()
     @IsNotEmpty()
-    orderPrice: number;
+    price: number;
   
     @IsString()
-    orderAddress: string;
+    address: string;
   
     @IsArray()
     @IsOptional()
