@@ -49,13 +49,16 @@ export class ProductService {
   }
 
   async update(id: number, updateProductDto: UpdateProductDto) {
+    if(!(await Product.findOne({where: {id}}))) {
+      throw new NotFoundException(`Product with id ${id} not found`);
+    }
     const res = await Product.update(updateProductDto, {
       where: {id: id},
     });
     if(!res[0]) {
-      throw new NotFoundException(`Product with id ${id} not found`);
+      throw new HttpException(`Object cannot be empty`, 400);
     }
-    console.log(res[0]);
+    // console.log(res[0]);
     console.log(this.findOne(id));
     return this.findOne(id);
   }

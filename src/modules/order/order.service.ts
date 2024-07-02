@@ -58,11 +58,14 @@ export class OrderService {
   }
 
   async update(id: number, updateOrderDto: UpdateOrderDto) {
+    if(!(await Order.findOne({where: {id}}))) {
+      throw new NotFoundException(`Order with id ${id} not found`);
+    }
     const res = await Order.update(updateOrderDto, {
       where: {id: id},
     });
     if(!res[0]) {
-      throw new NotFoundException(`Order with id ${id} not found`);
+      throw new HttpException(`Object cannot be empty`, 400);
     }
     return await Order.findOne({where: {id: id}});
   }
