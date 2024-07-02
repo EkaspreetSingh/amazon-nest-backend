@@ -7,7 +7,7 @@ import { Response } from "express";
 import { LoginUserDto } from "./dto/login-user.dto";
 import { QueryUserDto } from "./dto/query-user.dto";
 
-@Controller('user')
+@Controller('users')
 export class UserController {
     constructor(
         private readonly userService : UserService,

@@ -7,16 +7,16 @@ export class Product extends Model{
     @PrimaryKey
     @AutoIncrement
     @Column(DataType.INTEGER)
-    productId: number
+    id: number
 
     @Column(DataType.STRING)
-    productName: string
+    name: string
 
     @Column(DataType.INTEGER)
-    productPrice: number
+    price: number
 
     @Column(DataType.STRING)
-    productDescription: string
+    description: string
 
     @ForeignKey(()=>User)
     @Column(DataType.INTEGER)

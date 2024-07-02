@@ -14,7 +14,7 @@ export class AuthService {
   async signIn(
     loginUserDto: LoginUserDto,
     res: any
-  ): Promise<{ message: string }> {
+  )  {
     try {
       const user = await this.userService.getUserByEmail(loginUserDto.email);
       const isPasswordCorrect = await bcrypt.compare(loginUserDto.password, user.password);
@@ -25,8 +25,8 @@ export class AuthService {
       
      const access_token = await this.jwtService.signAsync(payload);
 
-     res.setHeader('access-token', access_token)
-     return { message: 'successfully signed in'};
+     res.setHeader('X-access-token', access_token)
+     return {"userId": user.id};
     
     }
     catch(err) {

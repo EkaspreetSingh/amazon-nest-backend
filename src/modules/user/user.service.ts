@@ -34,7 +34,10 @@ export default class UserService {
           ...queryUserDto.age && {age:{[Op.eq]:queryUserDto.age}},
           ...queryUserDto.isActive && {isActive:{[Op.eq]:queryUserDto.isActive}},
           ...queryUserDto.gender && {gender:{[Op.eq]:queryUserDto.gender}},
-        } 
+        }, 
+        attributes: {
+          exclude: ['password']
+        }
       });
       if (!resultUser.length) {
         throw new NotFoundException(`Query does not match any user`);
@@ -46,18 +49,20 @@ export default class UserService {
 
   }
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
-    try {
+  async create(createUserDto: CreateUserDto) {
+    // try {
       if (await this.isEmailAlreadyExists(createUserDto.email)) {
         throw new HttpException(`User with email ${createUserDto.email} already exists`, 400);
       }
       const hashedPassword = await bcrypt.hash(createUserDto.password, saltOrRounds);
       const newUser = await User.create({ ...createUserDto, password: hashedPassword });
-      return newUser;
-    } catch (err) {
-      console.log(err);
-      throw new HttpException(err.message, 500);
-    }
+      const {password, ...rest} = newUser.dataValues;
+      return rest;
+    // } catch (err) {
+    //   console.log(err);
+    //   // throw new HttpException(err.message, 500);
+    //   return err;
+    // }
   }
 
   async getUserById(id: number): Promise<User> {

@@ -49,21 +49,29 @@ export class OrderService {
   }
 
   async findOne(id: number) {
-    return await Order.findOne({where: {orderId: id}});
+    const res = await Order.findOne({where: {orderId: id}});
+    // console.log("------------------------------------------------"+res)
+    if(!res) {
+      throw new NotFoundException(`Order with id ${id} not found`);
+    }
+    return res;
   }
 
   async update(id: number, updateOrderDto: UpdateOrderDto) {
-    return await Order.update(updateOrderDto, {
+    const res = await Order.update(updateOrderDto, {
       where: {orderId: id},
-      returning: true,
     });
+    if(!res[0]) {
+      throw new NotFoundException(`Order with id ${id} not found`);
+    }
+    return await Order.findOne({where: {id: id}});
   }
 
   async remove(id: number) {
     try {
       const numberOfDeletedRows = await Order.destroy({ where: {orderId: id} });;
       if (numberOfDeletedRows === 0) {
-        throw new NotFoundException(`User with id ${id} not found`);
+        throw new NotFoundException(`Order with id ${id} not found`);
       }
       return { message: `Order with id ${id} removed` };
     }

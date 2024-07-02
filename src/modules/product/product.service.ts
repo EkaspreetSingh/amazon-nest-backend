@@ -12,26 +12,18 @@ export class ProductService {
     private userService: UserService) {}
 
   async create(createProductDto: CreateProductDto) {
-    // try {
-    //   const product = await Product.create(createProductDto);
-    //   return product;
-    // }
-    // catch(err) {
-    //   return err.message;
-    // }
-
     try {
       const user = await this.userService.getUserById(createProductDto.userId)
 
         if(user){
         const newProduct = await Product.create({
           userId: createProductDto.userId,
-          productName: createProductDto.productName,
-          productPrice: createProductDto.productPrice,
-          productDescription: createProductDto.productPrice,  
+          name: createProductDto.name,
+          price: createProductDto.price,
+          description: createProductDto.description,  
         });
     
-        console.log(newProduct);
+        // console.log(newProduct);
         return newProduct;
       }else{
         throw new HttpException("User not found", HttpStatus.NOT_FOUND);
@@ -44,25 +36,33 @@ export class ProductService {
 
   }
 
-  async findAll() {
-    
+  async findAll() { 
     return await Product.findAll();
   }
 
   async findOne(id: number) {
-    return await Product.findOne({where: {productId: id}});
+    const res = await Product.findOne({where: {id: id}});
+    if(!res) {
+      throw new NotFoundException(`Order with id ${id} not found`);
+    }
+    return res;
   }
 
   async update(id: number, updateProductDto: UpdateProductDto) {
-    return await Product.update(updateProductDto, {
-      where: {productId: id},
-      returning: true,
+    const res = await Product.update(updateProductDto, {
+      where: {id: id},
     });
+    if(!res[0]) {
+      throw new NotFoundException(`Product with id ${id} not found`);
+    }
+    console.log(res[0]);
+    console.log(this.findOne(id));
+    return this.findOne(id);
   }
 
   async remove(id: number) {
     try {
-      const numberOfDeletedRows = await Product.destroy({ where: {productId: id} });;
+      const numberOfDeletedRows = await Product.destroy({ where: {id: id} });;
       if (numberOfDeletedRows === 0) {
         throw new NotFoundException(`Product with id ${id} not found`);
       }
