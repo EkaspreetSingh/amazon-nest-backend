@@ -26,7 +26,7 @@ export class ProductService {
         // console.log(newProduct);
         return newProduct;
       }else{
-        throw new HttpException("User not found", HttpStatus.NOT_FOUND);
+        throw new HttpException("`User not found`", HttpStatus.NOT_FOUND);
       }
     }
     catch (error) {
@@ -45,6 +45,7 @@ export class ProductService {
     if(!res) {
       throw new NotFoundException(`Order with id ${id} not found`);
     }
+    console.log(res);
     return res;
   }
 
