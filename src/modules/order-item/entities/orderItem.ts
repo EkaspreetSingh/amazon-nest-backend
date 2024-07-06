@@ -19,4 +19,7 @@ export class OrderItem extends Model<OrderItem> {
 
   @Column(DataType.INTEGER)
   quantity: number;
+
+  @Column(DataType.INTEGER)
+  price: number;
 }

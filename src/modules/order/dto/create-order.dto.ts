@@ -1,6 +1,7 @@
 import { Type } from "class-transformer";
 import { IsArray, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString, ValidateNested } from "class-validator";
-import { OrderItem } from "src/modules/order-item/entities/orderItem";
+import { CreateOrderItemDto } from "src/modules/order-item/dto/create-orderItem.dto";
+// import { OrderItem } from "src/modules/order-item/entities/orderItem";
 
 
 export class CreateOrderDto {
@@ -19,6 +20,6 @@ export class CreateOrderDto {
     @IsArray()
     @IsOptional()
     @ValidateNested({ each: true })
-    @Type(() => OrderItem)
-    orderItems: OrderItem[];
+    @Type(() => CreateOrderItemDto)
+    orderItems: CreateOrderItemDto[];
 }

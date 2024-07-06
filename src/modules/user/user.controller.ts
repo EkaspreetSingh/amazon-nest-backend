@@ -29,15 +29,15 @@ export class UserController {
         return this.userService.getUserById(id);
     }
 
-    @Get('/products/:id')
-    getAllProducts(@Param('id', ParseIntPipe) id: number) {
-        return this.userService.getAllProducts(id);
-    }
+    // @Get('/products/:id')
+    // getAllProducts(@Param('id', ParseIntPipe) id: number) {
+    //     return this.userService.getAllProducts(id);
+    // }
 
-    @Get('/orders/:id')
-    getAllOrders(@Param('id', ParseIntPipe) id: number) {
-        return this.userService.getAllOrders(id);
-    }
+    // @Get('/orders/:id')
+    // getAllOrders(@Param('id', ParseIntPipe) id: number) {
+    //     return this.userService.getAllOrders(id);
+    // }
 
     @Put(':id')
     update(@Param('id',ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto) {

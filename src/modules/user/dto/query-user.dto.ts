@@ -1,10 +1,12 @@
-import { IsBoolean, IsEmail, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsPhoneNumber, IsString, IsStrongPassword } from "class-validator";
+import { IsBoolean, IsEmail, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsPhoneNumber, IsString, IsStrongPassword, Min } from "class-validator";
 import { ENUM_GENDER, ENUM_ROLES } from '../../../../constants';
+import { Transform } from "class-transformer";
 
 export class QueryUserDto {
 
-    @IsBoolean()
+    // @IsBoolean()
     @IsOptional()
+    // @Transform(({value})=>parseBool(value))
     isActive?: boolean;
 
     @IsOptional()
@@ -22,5 +24,18 @@ export class QueryUserDto {
 
     @IsNumber ()
     @IsOptional()
+    @Transform(({value})=>parseInt(value))
     age?: number;
+
+    @IsOptional()
+    @IsNumber()
+    @Min(1)
+    @Transform(({value})=>parseInt(value))
+    page?: number = 1;
+
+    @IsOptional()
+    @IsNumber()
+    @Min(1)
+    @Transform(({value})=>parseInt(value))
+    limit?: number = 10;
 }

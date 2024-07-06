@@ -1,89 +1,76 @@
-import { HttpException, Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
+import { Injectable, HttpException, NotFoundException, Inject, forwardRef } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderDto } from './dto/update-order.dto';
-import { Order } from './entities/order.entity';
-import { OrderItem } from '../order-item/entities/orderItem';
 import UserService from '../user/user.service';
+import { OrderRepository } from './repositories/order.repository';
+import { Order } from './entities/order.entity';
+import { QueryOrderDto } from './dto/query-order.dto';
 
 @Injectable()
 export class OrderService {
-
   constructor(
     @Inject(forwardRef(() => UserService))
-    private userService: UserService
+    private userService: UserService,
+    private orderRepository: OrderRepository,
   ) {}
 
-  async create(createOrderDto: CreateOrderDto) : Promise<Order> {
-    try {
-      const user = await this.userService.getUserById(createOrderDto.userId)
-      console.log(user);
+  async create(createOrderDto: CreateOrderDto): Promise<Order> {
+    const user = await this.userService.getUserById(createOrderDto.userId);
+    if (!user) {
+      throw new HttpException(`User with id ${createOrderDto.userId} not found`, 404);
+    }
 
-      if(!user) {
-        throw new HttpException(`User with id ${createOrderDto.userId} not found`, 404)
-      }
-      else {
-        const newOrder = await Order.create({
+    try {
+      const newOrder = await this.orderRepository.createOrder(
+        {
           userId: createOrderDto.userId,
           price: createOrderDto.price,
           address: createOrderDto.address,
-          orderItems: createOrderDto.orderItems,  
-        }, {
-          include: [OrderItem]
-        });
-
-        console.log(newOrder);
-        return newOrder;
-      }
+        },
+        createOrderDto.orderItems
+      );
+      return newOrder;
+    } catch (error) {
+      console.error(error);
+      throw new HttpException(`Error while creating order`, 500);
     }
-    catch (error) {
-      console.log(error);
-      // throw new Error('Error while creating order');
-      throw new HttpException(`User with id ${createOrderDto.userId} not found`, 404)
-    }
-
-
   }
 
-  async findAll() {
-    return await Order.findAll();
+  async findAll(queryOrderDto: QueryOrderDto) {
+
+    // console.log(queryOrderDto)
+
+    const { page, limit, userId, price, address } = queryOrderDto;
+    const offset = (page - 1) * limit;
+
+    const query = {
+      ...userId && { userId },
+      ...price && { price },
+      ...address && { address },
+    };
+
+    // console.log(query);
+
+    return await this.orderRepository.findAllOrders(query, offset, limit);
   }
 
   async findOne(id: number) {
-    const res = await Order.findOne({where: {id: id}});
-    // console.log("------------------------------------------------"+res)
-    if(!res) {
+    const order = await this.orderRepository.findOrderById(id);
+    if (!order) {
       throw new NotFoundException(`Order with id ${id} not found`);
     }
-    return res;
+    return order;
   }
 
-  async update(id: number, updateOrderDto: UpdateOrderDto) {
-    if(!(await Order.findOne({where: {id}}))) {
-      throw new NotFoundException(`Order with id ${id} not found`);
-    }
-    const res = await Order.update(updateOrderDto, {
-      where: {id: id},
-    });
-    if(!res[0]) {
-      throw new HttpException(`Object cannot be empty`, 400);
-    }
-    return await Order.findOne({where: {id: id}});
-  }
 
   async remove(id: number) {
-    try {
-      const numberOfDeletedRows = await Order.destroy({ where: {id: id} });;
-      if (numberOfDeletedRows === 0) {
-        throw new NotFoundException(`Order with id ${id} not found`);
-      }
-      return { message: `Order with id ${id} removed` };
+    const numberOfDeletedRows = await this.orderRepository.deleteOrder(id);
+    if (numberOfDeletedRows === 0) {
+      throw new NotFoundException(`Order with id ${id} not found`);
     }
-    catch (err) {
-      return err.message
-    }
+    return { message: `Order with id ${id} removed` };
   }
 
   async findOrdersByUserId(userId: number) {
-    return await Order.findAll({where: {userId: userId}})
+    return await this.orderRepository.findAllOrders({ userId }, 0, Infinity);
   }
 }

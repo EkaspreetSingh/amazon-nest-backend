@@ -5,19 +5,12 @@ import { UpdateUserDto } from "./dto/update-user.dto";
 import * as bcrypt from 'bcrypt';
 import { QueryUserDto } from "./dto/query-user.dto";
 import { Op } from "sequelize";
-import { ProductService } from "../product/product.service";
-import { OrderService } from "../order/order.service";
 
 const saltOrRounds = 10;
 
 @Injectable()
 export default class UserService {
   constructor(
-    @Inject(forwardRef(() => ProductService))
-    private productService: ProductService,
-
-    @Inject(forwardRef(() => OrderService))
-    private orderService: OrderService
   ) {}
 
   async isEmailAlreadyExists(email: string): Promise<boolean> {
@@ -27,6 +20,9 @@ export default class UserService {
 
   async findAll(queryUserDto: QueryUserDto): Promise<User[]> {
     console.log(queryUserDto)
+
+    const offset = (queryUserDto.page - 1) * queryUserDto.limit;
+
     if (queryUserDto) {
       const resultUser = await User.findAll({ 
         where: {
@@ -37,7 +33,9 @@ export default class UserService {
         }, 
         attributes: {
           exclude: ['password']
-        }
+        },
+        limit: queryUserDto.limit,
+        offset: offset
       });
       if (!resultUser.length) {
         throw new NotFoundException(`Query does not match any user`);
@@ -58,11 +56,6 @@ export default class UserService {
       const newUser = await User.create({ ...createUserDto, password: hashedPassword });
       const {password, ...rest} = newUser.dataValues;
       return rest;
-    // } catch (err) {
-    //   console.log(err);
-    //   // throw new HttpException(err.message, 500);
-    //   return err;
-    // }
   }
 
   async getUserById(id: number): Promise<User> {
@@ -113,11 +106,11 @@ export default class UserService {
     }
   }
 
-  async getAllProducts(id: number) {
-    return await this.productService.findProductsByUserId(id);
-  }
+  // async getAllProducts(id: number) {
+  //   return await this.productService.findProductsByUserId(id);
+  // }
   
-  async getAllOrders(id: number) {
-    return await this.orderService.findOrdersByUserId(id);
-  }
+  // async getAllOrders(id: number) {
+  //   return await this.orderService.findOrdersByUserId(id);
+  // }
 }
